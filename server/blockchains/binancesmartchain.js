@@ -126,19 +126,15 @@ let getBEP20TokenBalance = (smartContract, walletAddress) => {
 *  @param smartContract
 *  @param wallet
 */
-let getTokensNFT = async (smartContract, wallet) => {
-
-  
-  return new Promise(async (resolve, reject) => {    
-    const ABI = CONST.ABI_WEARECYRPTO_NFT
+let getTokensNFT = (smartContract, wallet) => {
+  let info = [];
+  return new Promise( (resolve, reject) => {    
+    const ABI = CONST.ABI_WEARECYRPTO_NFT;
     var contract = new web3.eth.Contract(ABI, smartContract);    
-    await contract.methods.getOwnedNftsAll(wallet).call().then(function (result) {    
-      
-      let info =  [];
-      result.forEach(data =>{        
-        var data ={tokenId: data.tokenId, course: data.courseCode, json: data.json }
-        info.push(data);      
-      });
+    contract.methods.getOwnedNftsAll(wallet).call().then( async function (result) {          
+       for await (const data of result) {
+        await datosToken(data).then(dataInfo=>{info.push(dataInfo)});        
+      }      
       resolve(info);
     }).catch(e => {
       console.log("error smart contract  -> ", e)
@@ -146,6 +142,26 @@ let getTokensNFT = async (smartContract, wallet) => {
     });
   });
 }
+
+/**
+ * 
+ * @param {*} data 
+ * @returns 
+ */
+var datosToken = async function(data) {
+  var datos = {tokenId : data.tokenId};
+  try {
+    const response = await axios.get(data.json);
+    datos.courseCode  = response.data.code!=undefined?response.data.code: data.courseCode;
+    datos.title= response.data.description!=undefined?response.data.description: null;
+    datos.image= response.data.image!=undefined?response.data.image: null;
+    return datos;    
+  } catch (error) {
+    datos.courseCode  = data.courseCode;
+    return datos;
+  }
+}
+
 
 /** 
 * Lee balance Ethereum y tokens 
