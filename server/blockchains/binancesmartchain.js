@@ -127,6 +127,7 @@ let getBEP20TokenBalance = (smartContract, walletAddress) => {
 *  @param wallet
 */
 let getTokensNFT = (smartContract, wallet) => {
+
   let info = [];
   return new Promise( (resolve, reject) => {    
     const ABI = CONST.ABI_WEARECYRPTO_NFT;
