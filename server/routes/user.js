@@ -3,14 +3,9 @@ const cors = require('cors');
 const bcrypt = require("bcrypt");
 const _ = require("underscore");
 const Usuario = require("../models/usuarios");
-const BlockchainsUser = require("../models/blockchains_user");
-const Blockchain = require("../models/blockchain");
 const { templateSignUp } = require("../template/template_email");
 const emailModule = require("../middleware/sendMail");
-const CONST = require("../commons/constants");
-const wallletBackend = require("../backend_blockchains/wallet");
-const Wallets = require("../models/wallets");
-const WalletUser = require("../models/wallet_user");
+
 
 const {
   verificaToken,
@@ -64,76 +59,6 @@ app.post("/api/signup", [validateCaptcha], (req, resp) => {
       });
       
     }
-  });
-});
-
-/**
- * Obtiene los blockchains de un usuario 
- * */
-app.post("/api/getBlockchainsUser", verificaToken, (req, resp) => {
-
-  const usuarioId = req.usuarioid;
-
-  BlockchainsUser.findOne(
-    { user: usuarioId }
-  ).exec((err, blocks) => {
-    if (err) {
-      return resp.status(500).json({
-        ok: false,
-        err,
-      });
-    }
-    if (!blocks) {
-      return resp.status(400).json({
-        ok: false,
-        err: {
-          blocks_user_notfound: true,
-        },
-      });
-    }
-    resp.json({
-      ok: true,
-      blockchains: blocks.blockchains
-    });
-  });
-});
-
-
-/**
- * Actualiza los blockchains de un usuario 
- * */
-app.post("/api/updateBlockchainsUser", verificaToken, (req, resp) => {
-
-  let body = req.body;
-  const blockchains = body.blockchains;
-  const usuarioId = req.usuarioid;
-
-  const update = { blockchains };
-
-  BlockchainsUser.findOneAndUpdate(
-    { user: usuarioId }, update, {
-    returnOriginal: false,
-    upsert: true,
-  }
-  ).exec((err, blocks) => {
-    if (err) {
-      return resp.status(500).json({
-        ok: false,
-        err,
-      });
-    }
-    if (!blocks) {
-      return resp.status(400).json({
-        ok: false,
-        err: {
-          blocks_user_notfound: true,
-        },
-      });
-    }
-    resp.json({
-      ok: true,
-      blockchains: blocks.blockchains
-    });
   });
 });
 

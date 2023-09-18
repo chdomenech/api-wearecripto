@@ -16,16 +16,23 @@ process.env.CADUCIDAD_TOKEN = Math.floor(Date.now() / 1000) + 60 * 60;
 // =======================
 //  Seed
 // =======================
-process.env.SEED = process.env.SEED || "QUITO-PICHINCHA-BRIDGE-TOVA";
+process.env.SEED = process.env.SEED || "QUITO-MEXICO-WEARECRYPTO-23";
 
 
 // =======================
 //  Base de datos
 // =======================
-process.env.MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/bridge";
+process.env.MONGODB_URI = process.env.MONGODB_URI || "mongodb://localhost:27017/wearecripto";
 
 
 // =======================
 //  URL Base
 // =======================
 process.env.URLBASE = process.env.URLBASE || "http://localhost:4200/";
+
+
+// =======================
+//  URL Base
+// =======================
+process.env.NODE_BSC = process.env.NODE_BSC || "https://data-seed-prebsc-1-s1.binance.org:8545";
+

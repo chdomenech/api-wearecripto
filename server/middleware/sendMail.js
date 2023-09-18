@@ -24,7 +24,7 @@ var transporter = nodemailer.createTransport({
 let sendEmail = (email,subjectTxt,contentHTML) => {
     transporter.sendMail(
       {
-        from: '"Admin TovaBridge" <admin@tovabridge.com>',
+        from: '"Admin Wearecripto" <info@cryptosolucion.com>',
         to: email,
         subject : subjectTxt,
         html: contentHTML
@@ -55,7 +55,7 @@ let sendEmail = (email,subjectTxt,contentHTML) => {
 let sendEmailWithParams = (userDB,subjectTxt,contentHTML) => {
     transporter.sendMail(
       {
-        from: '"Admin TovaBridge" <admin@tovabridge.com>',
+        from: '"Admin Wearecripto" <info@cryptosolucion.com>',
         to: userDB.email,
         subject : subjectTxt,
         html: contentHTML
@@ -88,8 +88,8 @@ let sendEmailComent = (name,email,subjectTxt,contentHTML) => {
   return new Promise((resolve, reject) => {
     transporter.sendMail(
       {
-        from:  'admin@tovabridge.com',
-        to: 'strongerdoge@gmail.com',
+        from:  'info@cryptosolucion.com',
+        to: 'chdomavi@gmail.com',
         subject : subjectTxt,
         html: 'name: '+name+ '<br>email: '+email+'<br>'+contentHTML,
       }, function(error, info){

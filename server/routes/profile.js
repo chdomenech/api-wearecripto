@@ -2,8 +2,6 @@ const express = require("express");
 const cors = require('cors');
 const _ = require("underscore");
 const Usuario = require("../models/usuarios");
-const Avatar = require("../models/avatar");
-const CONST = require("../commons/constants");
 const {
   verificaToken,
   verificaAdminRole,
@@ -43,23 +41,10 @@ app.post("/api/getDataProfileById", (req, resp) => {
         name: usuario.name,
         web: usuario.web,
         
-      }
+      } 
 
-      Avatar.findOne(
-        { user: userId }).exec((err, avatar) => {    
-          
-          if (err) {
-            return resp.status(500).json({
-              ok: false,
-              err,
-            });
-          }
-          if (avatar) {
-            info.logo = avatar.logo;            
-          }  
-
-        resp.json(info);  
-    });
+      resp.json(info);  
+    
   });
 });
 
@@ -100,21 +85,7 @@ app.post("/api/getDataProfile", [verificaToken], (req, resp) => {
         rifRuc: usuario.rifRuc,
       }
 
-      Avatar.findOne(
-        { user: usuarioId }).exec((err, avatar) => {    
-          
-          if (err) {
-            return resp.status(500).json({
-              ok: false,
-              err,
-            });
-          }
-          if (avatar) {
-            info.logo = avatar.logo;            
-          }  
-
-        resp.json(info);  
-    });
+      resp.json(info);
   });
 });
 
@@ -158,64 +129,6 @@ app.post("/api/saveDataProfile", [verificaToken], (req, resp) => {
           ok: true,
           saved: true
       });                  
-  });
-});
-
-/**
- * Guardar la imagen de perfil
- */
-app.post("/api/saveImageProfile", [verificaToken], (req, resp) => {
-    
-  const usuarioId = req.usuarioid;
-
-  Usuario.findOne(
-    { _id: usuarioId }
-  ).exec((err, usuario) => {
-      if (err) {
-        return resp.status(500).json({
-          ok: false,
-          err,
-        });
-      }
-      if (!usuario) {
-        return resp.status(400).json({
-          ok: false,
-          err: {
-            usernotfound: true,
-          },
-        });
-      }     
-
-
-    const logo = req.body.image; 
-    const update = { logo, user: usuario};
-
-    /** obtiene el perfil de compañia */
-    Avatar.findOneAndUpdate(
-      { user: usuario },update,{
-        returnOriginal: false,
-        upsert: true,
-      }
-    ).exec((err, competitor) => {
-        if (err) {
-          return resp.status(500).json({
-            ok: false,
-            err,
-          });
-        }
-        if (!competitor) {
-          return resp.status(400).json({
-            ok: false,
-            err: {
-              usernotfound: true,
-            },
-          });
-        }            
-        resp.json({
-          ok: true,
-          saved :true
-        });          
-      });
   });
 });
 
