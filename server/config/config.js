@@ -36,3 +36,8 @@ process.env.URLBASE = process.env.URLBASE || "http://localhost:4200/";
 // =======================
 process.env.NODE_BSC = process.env.NODE_BSC || "https://data-seed-prebsc-1-s1.binance.org:8545";
 
+
+
+process.env.CLOUD_NAME = process.env.CLOUD_NAME || 'dynoedar6';
+process.env.CLOUD_API_KEY = process.env.CLOUD_API_KEY || '389196716749124';
+process.env.CLOUD_API_SECRET= process.env.CLOUD_API_SECRET || 'bgtv6O1IiDypOsYX2lV-MktAO64';
