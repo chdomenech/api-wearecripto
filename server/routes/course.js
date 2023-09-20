@@ -377,6 +377,29 @@ app.post("/api/course/activateCourse", [verificaToken], (req, resp) => {
   });
 });
 
+/**
+ * Lista todos los cursos activos
+ */
+app.post("/api/course/findAllCoursesActive", async (req, resp) => {
+
+  Course.find({ status: true }).sort({ updated_at: -1 }).exec((err, courses) => {
+
+    if (err) {
+      return resp.status(500).json({
+        ok: false,
+        err,
+      });
+    }
+    else {
+      resp.json({
+        ok: true,
+        courses
+      });
+    }
+  });
+});
+
+
 
 
 
