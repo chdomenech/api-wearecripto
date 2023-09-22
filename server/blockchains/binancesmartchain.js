@@ -16,7 +16,11 @@ let getTokensNFT = (smartContract, wallet) => {
     var contract = new web3.eth.Contract(ABI, smartContract);    
     contract.methods.getOwnedNftsAll(wallet).call().then( async function (result) {          
        for await (const data of result) {
-        await datosToken(data).then(dataInfo=>{info.push(dataInfo)});        
+
+        var datos = {tokenId : data.tokenId, courseCode: data.courseCode}
+        info.push(datos)
+
+        //await datosToken(data).then(dataInfo=>{info.push(dataInfo)});        
       }      
       resolve(info);
     }).catch(e => {
@@ -26,11 +30,7 @@ let getTokensNFT = (smartContract, wallet) => {
   });
 }
 
-/**
- * 
- * @param {*} data 
- * @returns 
- */
+/*
 var datosToken = async function(data) {
   var datos = {tokenId : data.tokenId};
   try {
@@ -44,7 +44,7 @@ var datosToken = async function(data) {
     return datos;
   }
 }
-
+*/
 
 
 

@@ -2,7 +2,7 @@ const mongoose = require('mongoose');
 
 let Schema = mongoose.Schema;
 
-let sectionSchema = new Schema({
+let moduleSchema = new Schema({
     course:{
         type: mongoose.Schema.Types.ObjectId,
         ref: "courses",
@@ -20,10 +20,10 @@ let sectionSchema = new Schema({
 
 });
 
-sectionSchema.methods.toJSON = function() {
-    let section = this;
-    let sectionObject = section.toObject();    
-    return sectionObject;
+moduleSchema.methods.toJSON = function() {
+    let module = this;
+    let moduleObject = module.toObject();    
+    return moduleObject;
 }
 
-module.exports = mongoose.model('sections', sectionSchema);
+module.exports = mongoose.model('modules', moduleSchema);
