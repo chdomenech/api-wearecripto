@@ -13,7 +13,7 @@ app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
   const module = new Module({
     order: body.order,
     title: body.title,
-    course: body.couse,
+    course: body.course,
   });
 
   module.save((err, moduleDB) => {
@@ -83,7 +83,7 @@ app.post("/api/module/updateModule", [verificaToken], (req, resp) => {
  */
 app.post("/api/module/findAllModules", async (req, resp) => {
 
-  Module.find().sort({ updated_at: -1 }).exec((err, modules) => {
+  Module.find().sort({ order: 1 }).exec((err, modules) => {
 
     if (err) {
       return resp.status(500).json({
@@ -105,10 +105,10 @@ app.post("/api/module/findAllModules", async (req, resp) => {
 /**
  * Busca un modulo
  */
-app.post("/api/module/findModule", [verificaToken], async (req, resp) => {
+app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
 
-  const moduleId = req.body.moduleId;
-  Module.findOne({ _id: moduleId }).exec((err, module) => {
+  const courseId = req.body.courseId;
+  Module.find({ course: courseId }).exec((err, modules) => {
 
     if (err) {
       return resp.status(500).json({
@@ -120,7 +120,7 @@ app.post("/api/module/findModule", [verificaToken], async (req, resp) => {
       resp.json({
         ok: true,
         saved: true,
-        module
+        modules
       });
     }
   });

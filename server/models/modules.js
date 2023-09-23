@@ -8,7 +8,11 @@ let moduleSchema = new Schema({
         ref: "courses",
         required: [true, 'required']
     },
-    name: {
+    order: {
+        type: Number,      
+        required: [true, 'required']        
+    },
+    title: {
         type: String,
         trim: true,
         required: [true, 'required']        
