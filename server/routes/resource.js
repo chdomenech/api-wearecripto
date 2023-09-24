@@ -1,22 +1,24 @@
 const express = require("express");
 const cors = require('cors');
-const Module = require("../models/modules");
+const Resource = require("../models/resources");
 const {
   verificaToken
 } = require("../middleware/autenticacion");
 const app = express();
 app.use(cors());
 
-app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
+app.post("/api/resource/saveResource", [verificaToken], (req, resp) => {
 
   let body = req.body.data;
-  const module = new Module({
+  const resource = new Resource({
+    module: body.module,
     order: body.order,
     title: body.title,
-    course: body.course,
+    url: body.url,    
+    time: body.time
   });
 
-  module.save((err, moduleDB) => {
+  resource.save((err, resourceDB) => {
 
     if (err) {
       return resp.status(400).json({
@@ -28,7 +30,7 @@ app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
       resp.json({
         ok: true,
         saved: true,
-        module: moduleDB
+        resource: resourceDB
       });
     }
   });
@@ -39,30 +41,32 @@ app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
 
 
 /**
- * Actualiza el modulo
+ * Actualiza el recurso
  */
-app.post("/api/module/updateModule", [verificaToken], (req, resp) => {
+app.post("/api/resource/updateResource", [verificaToken], (req, resp) => {
 
   let body = req.body.data;
-  const moduleId = body._id;
+  const resourceId = body._id;
   
-  const module = {
+  const resource = {
     order: body.order,
-    title: body.title,    
+    title: body.title,
+    url: body.url,    
+    time: body.time    
   };
 
-  Module.findOneAndUpdate(
-    { _id: moduleId }, module, {
+  Resource.findOneAndUpdate(
+    { _id: resourceId }, resource, {
     new: true
   }
-  ).exec((err, moduleupdate) => {
+  ).exec((err, resourceUpdate) => {
     if (err) {
       return resp.status(500).json({
         ok: false,
         err,
       });
     }
-    if (!moduleupdate) {
+    if (!resourceUpdate) {
       return resp.status(400).json({
         ok: false,
         err: {
@@ -74,19 +78,19 @@ app.post("/api/module/updateModule", [verificaToken], (req, resp) => {
     resp.json({
       ok: true,
       saved: true,
-      module: moduleupdate
+      resource: resourceUpdate
     });
 
   });
 });
 
 /**
- * Busca un modulo
+ * Busca un recurso
  */
-app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
+app.post("/api/resource/findResources", [verificaToken], async (req, resp) => {
 
-  const courseId = req.body.courseId;
-  Module.find({ course: courseId }).sort({ order: 1 }).exec((err, modules) => {
+  const moduleId = req.body.moduleId;
+  Resource.find({ module: moduleId }).sort({ order: 1 }).exec((err, resources) => {
 
     if (err) {
       return resp.status(500).json({
@@ -98,7 +102,7 @@ app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
       resp.json({
         ok: true,
         saved: true,
-        modules
+        resources
       });
     }
   });
@@ -106,13 +110,12 @@ app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
 
 
 /**
- * Borra el modulo
+ * Borra el recurso
  */
-app.post("/api/module/deleteModule", [verificaToken], async (req, resp) => {
+app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
 
-  var moduleId = req.body.module_id;
-
-    Module.remove({ _id: moduleId }, function (err) {
+  var resourceId = req.body.resource_id;
+      Resource.remove({ _id: resourceId }, function (err) {
       if (err) {
         return resp.status(500).json({
           ok: false,
@@ -126,35 +129,34 @@ app.post("/api/module/deleteModule", [verificaToken], async (req, resp) => {
         });
       }
     });
-
 });
 
 /**
  * Activa/Desactiva el curso
  */
-app.post("/api/module/activateModule", [verificaToken], (req, resp) => {
+app.post("/api/resource/activateResource", [verificaToken], (req, resp) => {
 
   let body = req.body;
 
-  const moduleId = body.module._id;
+  const resourceId = body.resource._id;
   const status = body.status;
 
-  const module = {
+  const resource = {
     status
   };
 
-  Module.findOneAndUpdate(
-    { _id: moduleId }, module, {
+  Resource.findOneAndUpdate(
+    { _id: resourceId }, resource, {
     new: true
   }
-  ).exec((err, modul) => {
+  ).exec((err, resour) => {
     if (err) {
       return resp.status(500).json({
         ok: false,
         err,
       });
     }
-    if (!modul) {
+    if (!resour) {
       return resp.status(400).json({
         ok: false,
         err: {
@@ -166,7 +168,7 @@ app.post("/api/module/activateModule", [verificaToken], (req, resp) => {
     resp.json({
       ok: true,
       saved: true,
-      module: modul
+      resource: resour
     });
 
   });
@@ -175,9 +177,9 @@ app.post("/api/module/activateModule", [verificaToken], (req, resp) => {
 /**
  * Lista todos los cursos activos
  */
-app.post("/api/module/findAllModulesActive", async (req, resp) => {
+app.post("/api/resource/findAllResourcesActive", async (req, resp) => {
 
-  Module.find({ status: true }).sort({ updated_at: -1 }).exec((err, modules) => {
+  Resource.find({ status: true }).sort({ updated_at: -1 }).exec((err, resources) => {
 
     if (err) {
       return resp.status(500).json({
@@ -188,7 +190,7 @@ app.post("/api/module/findAllModulesActive", async (req, resp) => {
     else {
       resp.json({
         ok: true,
-        modules
+        resources
       });
     }
   });
