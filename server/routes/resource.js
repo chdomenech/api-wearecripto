@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const Resource = require("../models/resources");
+const Module = require("../models/modules");
 const {
   verificaToken
 } = require("../middleware/autenticacion");
@@ -14,7 +15,7 @@ app.post("/api/resource/saveResource", [verificaToken], (req, resp) => {
     module: body.module,
     order: body.order,
     title: body.title,
-    url: body.url,    
+    url: body.url,
     time: body.time
   });
 
@@ -27,16 +28,62 @@ app.post("/api/resource/saveResource", [verificaToken], (req, resp) => {
       });
 
     } else {
-      resp.json({
-        ok: true,
-        saved: true,
-        resource: resourceDB
+
+      Module.findOne({ _id: body.module }).exec((err, module) => {
+        if (err) {
+          return resp.status(500).json({
+            ok: false,
+            err,
+          });
+        }
+
+        if (!module) {
+          return resp.status(400).json({
+            ok: false,
+            err: {
+              modulenotfound: true,
+            },
+          });
+        }
+        else if (module) {
+
+          resources_modules = module.resources;
+          resources_modules.push(resourceDB._id);
+
+          const resourcesIds = {
+            resources: resources_modules
+          }
+
+          Module.findOneAndUpdate(
+            { _id: body.module }, resourcesIds, {
+            new: true
+          }
+          ).exec((err, moduleUpdate) => {
+            if (err) {
+              return resp.status(500).json({
+                ok: false,
+                err,
+              });
+            }
+            if (!moduleUpdate) {
+              return resp.status(400).json({
+                ok: false,
+                err: {
+                  modulenotfound: true,
+                },
+              });
+            }
+            resp.json({
+              ok: true,
+              saved: true,
+              resource: resourceDB
+            });
+          });
+        }
       });
     }
   });
 });
-
-
 
 
 
@@ -47,13 +94,15 @@ app.post("/api/resource/updateResource", [verificaToken], (req, resp) => {
 
   let body = req.body.data;
   const resourceId = body._id;
-  
+
   const resource = {
     order: body.order,
     title: body.title,
-    url: body.url,    
-    time: body.time    
+    url: body.url,
+    time: body.time
   };
+
+  console.log(resourceId);
 
   Resource.findOneAndUpdate(
     { _id: resourceId }, resource, {
@@ -70,7 +119,7 @@ app.post("/api/resource/updateResource", [verificaToken], (req, resp) => {
       return resp.status(400).json({
         ok: false,
         err: {
-          modulenotfound: true,
+          resourcenotfound: true,
         },
       });
     }
@@ -115,20 +164,20 @@ app.post("/api/resource/findResources", [verificaToken], async (req, resp) => {
 app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
 
   var resourceId = req.body.resource_id;
-      Resource.remove({ _id: resourceId }, function (err) {
-      if (err) {
-        return resp.status(500).json({
-          ok: false,
-          err,
-        });
-      }
-      else {
+  Resource.remove({ _id: resourceId }, function (err) {
+    if (err) {
+      return resp.status(500).json({
+        ok: false,
+        err,
+      });
+    }
+    else {
 
-        resp.json({
-          ok: true
-        });
-      }
-    });
+      resp.json({
+        ok: true
+      });
+    }
+  });
 });
 
 /**
@@ -138,7 +187,7 @@ app.post("/api/resource/activateResource", [verificaToken], (req, resp) => {
 
   let body = req.body;
 
-  const resourceId = body.resource._id;
+  const resourceId = body.resource;
   const status = body.status;
 
   const resource = {
@@ -160,7 +209,7 @@ app.post("/api/resource/activateResource", [verificaToken], (req, resp) => {
       return resp.status(400).json({
         ok: false,
         err: {
-          modulenotfound: true,
+          resourcenotfound: true,
         },
       });
     }
@@ -195,9 +244,5 @@ app.post("/api/resource/findAllResourcesActive", async (req, resp) => {
     }
   });
 });
-
-
-
-
 
 module.exports = app;

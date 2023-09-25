@@ -25,7 +25,10 @@ let moduleSchema = new Schema({
         type: Date, 
         default: Date.now 
     },    
-
+    resources:[{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "resources"        
+    }],
 });
 
 moduleSchema.methods.toJSON = function() {

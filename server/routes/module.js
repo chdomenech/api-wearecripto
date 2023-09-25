@@ -1,9 +1,11 @@
 const express = require("express");
 const cors = require('cors');
 const Module = require("../models/modules");
+const Resources = require("../models/resources");
 const {
   verificaToken
 } = require("../middleware/autenticacion");
+const resources = require("../models/resources");
 const app = express();
 app.use(cors());
 
@@ -14,6 +16,7 @@ app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
     order: body.order,
     title: body.title,
     course: body.course,
+    resources: []
   });
 
   module.save((err, moduleDB) => {
@@ -33,8 +36,6 @@ app.post("/api/module/saveModule", [verificaToken], (req, resp) => {
     }
   });
 });
-
-
 
 
 
@@ -86,7 +87,8 @@ app.post("/api/module/updateModule", [verificaToken], (req, resp) => {
 app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
 
   const courseId = req.body.courseId;
-  Module.find({ course: courseId }).sort({ order: 1 }).exec((err, modules) => {
+
+  Module.find({ course: courseId }).populate('resources').sort({ order: 1 }).exec((err, modules) => {
 
     if (err) {
       return resp.status(500).json({
@@ -95,6 +97,10 @@ app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
       });
     }
     else {
+
+      
+
+
       resp.json({
         ok: true,
         saved: true,
