@@ -85,8 +85,6 @@ app.post("/api/resource/saveResource", [verificaToken], (req, resp) => {
   });
 });
 
-
-
 /**
  * Actualiza el recurso
  */
@@ -161,22 +159,96 @@ app.post("/api/resource/findResources", [verificaToken], async (req, resp) => {
  */
 app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
 
-  var resourceId = req.body.resource_id;
-  Resource.remove({ _id: resourceId }, function (err) {
-    if (err) {
-      return resp.status(500).json({
-        ok: false,
-        err,
-      });
-    }
-    else {
+     var resourceId = req.body.resource_id;
 
-      resp.json({
-        ok: true
-      });
-    }
+     //Busco el  recurso
+     Resource.findOne({ _id: resourceId }).exec((err, resource) => {
+      if (err) {
+        return resp.status(500).json({
+          ok: false,
+          err,
+        });
+      }
+      //Si existe
+      if(resource){
+
+        //Busco el modulo
+        Module.findOne({ _id: resource.module }).exec((err, module) => {
+
+          if (err) {
+            return resp.status(500).json({
+              ok: false,
+              err,
+            });
+          }
+
+          if(module){
+
+            var resources =  module.resources.filter(function(valor) {
+              return valor != resourceId;
+            });
+
+            const resourcesIds = {
+              resources
+            }
+  
+            Module.findOneAndUpdate(
+              { _id: module._id }, resourcesIds, {
+              new: true
+            }
+            ).exec((err, moduleUpdate) => {
+              if (err) {
+                return resp.status(500).json({
+                  ok: false,
+                  err,
+                });
+              }
+
+              if (!moduleUpdate) {
+                return resp.status(400).json({
+                  ok: false,
+                  err: {
+                    modulenotfound: true,
+                  },
+                });
+              }
+              //REMUEVO EL RECURSO
+              Resource.remove({ _id: resourceId }, function (err) {
+                if (err) {
+                  return resp.status(500).json({
+                    ok: false,
+                    err,
+                  });
+                }
+                else {
+                  resp.json({
+                    ok: true
+                  });
+                }
+              });  
+            });
+
+          }else{
+            return resp.status(400).json({
+              ok: false,
+              err: {
+                modulenotfound: true,
+              },
+            });
+          }
+        })      
+      }else{
+        return resp.status(400).json({
+          ok: false,
+          err: {
+            resourcenotfound: true,
+          },
+        });
+      }  
+    });
   });
-});
+
+
 
 /**
  * Activa/Desactiva el curso

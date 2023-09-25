@@ -1,11 +1,10 @@
 const express = require("express");
 const cors = require('cors');
 const Module = require("../models/modules");
-const Resources = require("../models/resources");
+const Resource = require("../models/resources");
 const {
   verificaToken
 } = require("../middleware/autenticacion");
-const resources = require("../models/resources");
 const app = express();
 app.use(cors());
 
@@ -46,10 +45,10 @@ app.post("/api/module/updateModule", [verificaToken], (req, resp) => {
 
   let body = req.body.data;
   const moduleId = body._id;
-  
+
   const module = {
     order: body.order,
-    title: body.title,    
+    title: body.title,
   };
 
   Module.findOneAndUpdate(
@@ -97,10 +96,6 @@ app.post("/api/module/findModules", [verificaToken], async (req, resp) => {
       });
     }
     else {
-
-      
-
-
       resp.json({
         ok: true,
         saved: true,
@@ -118,21 +113,61 @@ app.post("/api/module/deleteModule", [verificaToken], async (req, resp) => {
 
   var moduleId = req.body.module_id;
 
-    Module.remove({ _id: moduleId }, function (err) {
-      if (err) {
-        return resp.status(500).json({
-          ok: false,
-          err,
-        });
-      }
-      else {
+  Module.findOne({ _id: moduleId }).exec((err, module) => {
 
-        resp.json({
-          ok: true
-        });
-      }
-    });
+    if (err) {
+      return resp.status(500).json({
+        ok: false,
+        err,
+      });
+    }
 
+    //Si el modulo existe
+    if(module){
+
+      //Verifico que no tenga recursos asociados
+      Resource.countDocuments({ module: module._id }).exec((err, count) => {
+        
+        if (err) {
+          return resp.status(500).json({
+            ok: false,
+            err,
+          });
+
+        }else if(count>0){
+
+          return resp.status(400).json({
+            ok: false,
+            err: {
+              modulehaveresource: true,
+            },
+          });
+        }else if(count == 0){
+
+          Module.remove({ _id: module._id }, function (err) {
+            if (err) {
+              return resp.status(500).json({
+                ok: false,
+                err,
+              });
+            }
+            else {    
+              resp.json({
+                ok: true
+              });
+            }
+          });
+        }   
+      });
+    }else{
+      return resp.status(400).json({
+        ok: false,
+        err: {
+          modulenotfound: true,
+        },
+      });
+    }
+   });   
 });
 
 /**
@@ -199,9 +234,5 @@ app.post("/api/module/findAllModulesActive", async (req, resp) => {
     }
   });
 });
-
-
-
-
 
 module.exports = app;

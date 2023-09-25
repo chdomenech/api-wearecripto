@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require('cors');
 const Course = require("../models/courses");
+const Module = require("../models/modules");
 const cloudinary = require("cloudinary");
 const {
   verificaToken
@@ -180,13 +181,13 @@ app.post("/api/course/updateCourse", [verificaToken], (req, resp) => {
 
   let body = req.body.data;
   const courseId = body._id;
-  
+
   const course = {
     code: body.code,
     title: body.title,
     small_description: body.sinopsis,
     long_description: body.description,
-    price: body.price,    
+    price: body.price,
   };
 
   Course.findOneAndUpdate(
@@ -246,7 +247,7 @@ app.post("/api/course/findAllCourses", async (req, resp) => {
 app.post("/api/course/findCourseByCode", async (req, resp) => {
 
   course_code = req.body.code;
-  Article.findOne({ code: course_code}).exec((err, course) => {
+  Article.findOne({ code: course_code }).exec((err, course) => {
 
     if (err) {
       return resp.status(500).json({
@@ -254,21 +255,21 @@ app.post("/api/course/findCourseByCode", async (req, resp) => {
         err,
       });
     }
-    else 
-    if (!course) {
-      return resp.status(400).json({
-        ok: false,
-        err: {
-          coursenotfound: true,
-        },
-      });
-    }
-    else {
-      resp.json({
-        ok: true,
-        course
-      });
-    }
+    else
+      if (!course) {
+        return resp.status(400).json({
+          ok: false,
+          err: {
+            coursenotfound: true,
+          },
+        });
+      }
+      else {
+        resp.json({
+          ok: true,
+          course
+        });
+      }
   });
 });
 
@@ -313,24 +314,53 @@ app.post("/api/course/deleteCourse", [verificaToken], async (req, resp) => {
       });
     }
 
-    if (course.image_id) {
-      cloudinary.v2.api.delete_resources(course.image_id)
-        .then(result => console.log(result));
-    }
-    Course.remove({ _id: courseId }, function (err) {
-      if (err) {
-        return resp.status(500).json({
-          ok: false,
-          err,
-        });
-      }
-      else {
+    if(course){
 
-        resp.json({
-          ok: true
-        });
-      }
-    });
+      //Verifico que no tenga modulos asociados
+      Module.countDocuments({ course: course._id }).exec((err, count) => {
+        if (err) {
+          return resp.status(500).json({
+            ok: false,
+            err,
+          });
+        }else if(count>0){
+
+          return resp.status(400).json({
+            ok: false,
+            err: {
+              coursehavemodule: true,
+            },
+          });
+          
+        }else if(count == 0){
+          if (course.image_id) {
+            cloudinary.v2.api.delete_resources(course.image_id)
+              .then(result => console.log(result));
+          }
+          Course.remove({ _id: courseId }, function (err) {
+            if (err) {
+              return resp.status(500).json({
+                ok: false,
+                err,
+              });
+            }
+            else {  
+              resp.json({
+                ok: true
+              });
+            }
+          });
+        }
+      });
+    
+    }else{
+      return resp.status(400).json({
+        ok: false,
+        err: {
+          coursenotfound: true,
+        },
+      });
+    }
   });
 });
 
@@ -398,9 +428,5 @@ app.post("/api/course/findAllCoursesActive", async (req, resp) => {
     }
   });
 });
-
-
-
-
 
 module.exports = app;
