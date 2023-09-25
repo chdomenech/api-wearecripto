@@ -102,8 +102,6 @@ app.post("/api/resource/updateResource", [verificaToken], (req, resp) => {
     time: body.time
   };
 
-  console.log(resourceId);
-
   Resource.findOneAndUpdate(
     { _id: resourceId }, resource, {
     new: true
