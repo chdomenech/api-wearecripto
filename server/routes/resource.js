@@ -182,8 +182,11 @@ app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
             });
           }
 
+
+          //Si existe
           if(module){
 
+            //Quito del campo recursos del modulo el que voy a eliminar
             var resources =  module.resources.filter(function(valor) {
               return valor != resourceId;
             });
@@ -191,7 +194,8 @@ app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
             const resourcesIds = {
               resources
             }
-  
+            
+            //actualizo
             Module.findOneAndUpdate(
               { _id: module._id }, resourcesIds, {
               new: true
@@ -212,7 +216,7 @@ app.post("/api/resource/deleteResource", [verificaToken], async (req, resp) => {
                   },
                 });
               }
-              //REMUEVO EL RECURSO
+              //Borro el recurso
               Resource.remove({ _id: resourceId }, function (err) {
                 if (err) {
                   return resp.status(500).json({

@@ -216,9 +216,11 @@ app.post("/api/module/activateModule", [verificaToken], (req, resp) => {
 /**
  * Lista todos los cursos activos
  */
-app.post("/api/module/findAllModulesActive", async (req, resp) => {
+app.post("/api/module/listAllModules", async (req, resp) => {
 
-  Module.find({ status: true }).sort({ updated_at: -1 }).exec((err, modules) => {
+  const course_id = req.body.course;
+
+  Module.find({ course: course_id }).populate('resources').sort({ order: 1 }).exec((err, modules) => {
 
     if (err) {
       return resp.status(500).json({

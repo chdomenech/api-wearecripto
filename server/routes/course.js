@@ -247,7 +247,7 @@ app.post("/api/course/findAllCourses", async (req, resp) => {
 app.post("/api/course/findCourseByCode", async (req, resp) => {
 
   course_code = req.body.code;
-  Article.findOne({ code: course_code }).exec((err, course) => {
+  Course.findOne({ code: course_code }).exec((err, course) => {
 
     if (err) {
       return resp.status(500).json({
@@ -410,9 +410,9 @@ app.post("/api/course/activateCourse", [verificaToken], (req, resp) => {
 /**
  * Lista todos los cursos activos
  */
-app.post("/api/course/findAllCoursesActive", async (req, resp) => {
+app.post("/api/course/listAllCourses", async (req, resp) => {
 
-  Course.find({ status: true }).sort({ updated_at: -1 }).exec((err, courses) => {
+  Course.find( ).sort({ updated_at: -1 }).exec((err, courses) => {
 
     if (err) {
       return resp.status(500).json({
