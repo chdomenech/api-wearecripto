@@ -1,5 +1,5 @@
 Web3 = require('web3');
-const web3 = new Web3(new Web3.providers.HttpProvider(process.env.NODE_BSC));
+const web3 = new Web3(new Web3.providers.HttpProvider(process.env.NODE_POLYGON));
 const axios = require('axios');
 const CONST = require("../commons/constants");
 

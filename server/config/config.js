@@ -34,7 +34,7 @@ process.env.URLBASE = process.env.URLBASE || "http://localhost:4200/";
 // =======================
 //  URL Base
 // =======================
-process.env.NODE_BSC = process.env.NODE_BSC || "https://data-seed-prebsc-1-s1.binance.org:8545";
+process.env.NODE_POLYGON = process.env.NODE_POLYGON || "https://polygon-testnet-rpc.allthatnode.com:8545";
 
 
 
