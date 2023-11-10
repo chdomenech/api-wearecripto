@@ -30,26 +30,32 @@ let getTokensNFT = (smartContract, wallet) => {
   });
 }
 
-/*
-var datosToken = async function(data) {
-  var datos = {tokenId : data.tokenId};
-  try {
-    const response = await axios.get(data.json);
-    datos.courseCode  = response.data.code!=undefined?response.data.code: data.courseCode;
-    datos.title= response.data.description!=undefined?response.data.description: null;
-    datos.image= response.data.image!=undefined?response.data.image: null;
-    return datos;    
-  } catch (error) {
-    datos.courseCode  = data.courseCode;
-    return datos;
-  }
-}
+/** 
+* Read the tokens Balance
+*  @param smartContract
+*  @param wallet
 */
-
+let getTokensNFTWAC = (smartContract, wallet) => {
+  return new Promise( (resolve, reject) => {    
+    const ABI = CONST.ABI_WEARECYRPTO_NFT_WAC;
+    var contract = new web3.eth.Contract(ABI, smartContract);    
+    contract.methods.balanceOf(wallet).call().then( async function (result) {          
+      console.log(result);
+      if(result>0){
+        resolve(true);
+      }else{
+        resolve(false);
+      }
+    }).catch(e => {
+      console.log("error smart contract  -> ", e)
+      reject(e)
+    });
+  });
+}
 
 
 module.exports = {
-  getTokensNFT
+  getTokensNFT,getTokensNFTWAC
 };
 
 
